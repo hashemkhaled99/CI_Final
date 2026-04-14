@@ -1,5 +1,5 @@
-import os  # Unused import
-import sys # Unused import
+def calculate_total(price: float, tax: float) -> float:
+    """Calculate the total price including tax."""
+    return price + (price * tax)
 
-def calculate_total():
-    x = 10
+print(calculate_total(100.0, 0.05))
