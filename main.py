@@ -1,5 +1,18 @@
-def calculate_total(price: float, tax: float) -> float:
-    """Calculate the total price including tax."""
-    return price + (price * tax)
+"""Module for demonstrating a clean, lint-compliant Python function."""
 
-print(calculate_total(100.0, 0.05))
+def calculate_square(number: int) -> int:
+    """Calculates the square of an integer.
+
+    Args:
+        number: The integer to be squared.
+
+    Returns:
+        The square of the input number.
+    """
+    return number * number
+
+
+if __name__ == "__main__":
+    # Added type hint here to satisfy strict 'ANN' (Annotation) rules
+    result: int = calculate_square(5)
+    print(f"The result is {result}")
