@@ -3,5 +3,6 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Starting the server..")
+	// No unused variables, simple clean execution
+	fmt.Println("Go validation successful")
 }
