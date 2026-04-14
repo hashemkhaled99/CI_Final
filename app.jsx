@@ -13,11 +13,8 @@ export function App() {
     <div className="app-wrapper">
       <h1>{targetSystem} Validated</h1>
       <p>Your React environment is correctly parsing JSX and enforcing Biome rules.</p>
-      
-      <button 
-        type="button" 
-        onClick={() => setClickCount(clickCount + incrementValue)}
-      >
+
+      <button type="button" onClick={() => setClickCount(clickCount + incrementValue)}>
         Test CI Clicks: {clickCount}
       </button>
     </div>
