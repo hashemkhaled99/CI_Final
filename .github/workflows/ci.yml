@@ -1,0 +1,125 @@
+name: Polyglot CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # -------------------------------------------------------------
+  # 1. DETECTION PHASE: Identifies which languages were modified
+  # -------------------------------------------------------------
+  detect:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      python: ${{ steps.filter.outputs.python }}
+      golang: ${{ steps.filter.outputs.golang }}
+      react: ${{ steps.filter.outputs.react }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Path Filter
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/pyproject.toml'
+              - '**/requirements.txt'
+            golang:
+              - '**/*.go'
+              - '**/go.mod'
+              - '**/go.sum'
+            react:
+              - '**/*.js'
+              - '**/*.jsx'
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/package.json'
+
+  # -------------------------------------------------------------
+  # 2. VALIDATION PHASE: Runs only the needed linters in parallel
+  # -------------------------------------------------------------
+  lint-python:
+    name: Lint Python
+    needs: detect
+    if: needs.detect.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Run Ruff
+        uses: astral-sh/ruff-action@v1
+
+  lint-go:
+    name: Lint Go
+    needs: detect
+    if: needs.detect.outputs.golang == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+
+  lint-react:
+    name: Lint React
+    needs: detect
+    if: needs.detect.outputs.react == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run ESLint
+        run: npm run lint
+
+  # -------------------------------------------------------------
+  # 3. REPORTING PHASE: Generates a Markdown table summary
+  # -------------------------------------------------------------
+  report:
+    name: CI Summary Report
+    needs: [detect, lint-python, lint-go, lint-react]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write Summary Table
+        run: |
+          echo "### 🚀 CI Validation Report" >> $GITHUB_STEP_SUMMARY
+          echo "| Language | Detected | Job Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|----------|------------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Python Report
+          if [ "${{ needs.detect.outputs.python }}" == "true" ]; then
+            echo "| 🐍 Python | ✅ Yes | ${{ needs.lint-python.result }} |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🐍 Python | ❌ No | Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Go Report
+          if [ "${{ needs.detect.outputs.golang }}" == "true" ]; then
+            echo "| 🐹 Go | ✅ Yes | ${{ needs.lint-go.result }} |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🐹 Go | ❌ No | Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # React Report
+          if [ "${{ needs.detect.outputs.react }}" == "true" ]; then
+            echo "| ⚛️ React | ✅ Yes | ${{ needs.lint-react.result }} |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ⚛️ React | ❌ No | Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
