@@ -1,18 +1,26 @@
-"""Module for demonstrating a clean, lint-compliant Python function."""
+"""Main entry point for the Python service."""
 
-def calculate_square(number: int) -> int:
-    """Calculates the square of an integer.
+import logging
+
+# Configure basic logging to avoid T201 print() violations
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def generate_greeting(name: str) -> str:
+    """Generate a greeting message for a user.
 
     Args:
-        number: The integer to be squared.
+        name (str): The name of the user to greet.
 
     Returns:
-        The square of the input number.
+        str: A personalized greeting message.
     """
-    return number * number
+    return f"Pipeline successfully passed for {name}!"
 
+def main() -> None:
+    """Execute the main application logic."""
+    message = generate_greeting("Python")
+    logger.info(message)
 
 if __name__ == "__main__":
-    # Added type hint here to satisfy strict 'ANN' (Annotation) rules
-    result: int = calculate_square(5)
-    print(f"The result is {result}")
+    main()
