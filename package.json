@@ -2,11 +2,12 @@
   "name": "react-ci-test",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint . --ext .js,.jsx"
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "format": "biome format --write ."
   },
   "devDependencies": {
-    "eslint": "^8.0.0",
-    "eslint-plugin-react": "^7.0.0"
+    "@biomejs/biome": "^1.8.3"
   },
   "dependencies": {
     "react": "^18.0.0",

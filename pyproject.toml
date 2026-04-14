@@ -1,4 +1,4 @@
-[tool.ruff]
+[tool.ruff.lint]
 # Enable almost all rules (E: Errors, F: Pyflakes, UP: Upgrade, B: Bugbear, SIM: Simplify)
 select = ["ALL"]
 ignore = [
